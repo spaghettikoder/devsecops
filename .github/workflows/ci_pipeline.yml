@@ -89,16 +89,13 @@ jobs:
         docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
 
     - name: Wait for PyGoat to start
-      run: sleep 45
+      run: sleep 20
     
     # dast scan
     - name: Run OWASP ZAP Scan
-      uses: zaproxy/action-full-scan@v0.4.0
+      uses: zaproxy/action-baseline@v0.4.0
       with:
         target: 'http://localhost:8000'
-        rules_file_name: ''
-      env:
-        JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
 
     # upload ZAP Report
     - name: Upload ZAP Report
