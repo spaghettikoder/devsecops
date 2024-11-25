@@ -67,3 +67,55 @@ jobs:
      with:
        name: docker-scout-findings
        path: scout-report.sarif
+
+
+ dast_scan:
+  name: Deploy and Perform DAST Scan
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker-practice/actions-setup-docker@v1
+      with:
+        docker_version: '20.10.7'
+
+    # Step 3: Deploy PyGoat by pulling the image
+    # - name: Deploy PyGoat
+    #   run: |
+    #     docker pull pygoat/pygoat:latest
+    #     docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
+
+    - name: Build PyGoat Docker Image
+      run: docker build -t myrepo/pygoat:latest .
+
+    - name: Run PyGoat
+      run: docker run --rm -d -p 8000:8000 myrepo/pygoat:latest
+
+    - name: Wait for PyGoat to start
+      run: sleep 45
+    
+    # dast scan
+    - name: Run OWASP ZAP Scan
+      uses: zaproxy/action-full-scan@v0.4.0
+      with:
+        target: 'http://localhost:8000'
+        rules_file_name: ''
+      env:
+        JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
+
+    # upload ZAP Report
+    - name: Upload ZAP Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: zap-scan-report
+        path: /zap/wrk/
+
+    # summary of DAST
+    - name: Display Findings Summary
+      run: |
+        echo "Parsing ZAP Report"
+        grep "<alertitem>" -A 10 /zap/wrk/alerts.json | head -n 50 || echo "no alrets has been found"
