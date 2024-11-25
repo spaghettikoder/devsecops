@@ -82,17 +82,11 @@ jobs:
       with:
         docker_version: '20.10.7'
 
-    # Step 3: Deploy PyGoat by pulling the image
-    # - name: Deploy PyGoat
-    #   run: |
-    #     docker pull pygoat/pygoat:latest
-    #     docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
-
-    - name: Build PyGoat Docker Image
-      run: docker build -t myrepo/pygoat:latest .
-
-    - name: Run PyGoat
-      run: docker run --rm -d -p 8000:8000 myrepo/pygoat:latest
+    # deploy PyGoat by pulling the image from docker hub
+    - name: Deploy PyGoat
+      run: |
+        docker pull pygoat/pygoat:latest
+        docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
 
     - name: Wait for PyGoat to start
       run: sleep 45
