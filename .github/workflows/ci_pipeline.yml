@@ -89,7 +89,7 @@ jobs:
       run: nohup python3 manage.py runserver 0.0.0.0:8000 &
 
     - name: Pause for Server Initialization
-      run: sleep 10
+      run: sleep 15
 
     - name: Test Server Endpoint
       run: curl -I http://127.0.0.1:8000
